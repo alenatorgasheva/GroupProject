@@ -3,9 +3,9 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class InMemoryFlightRepository {
-    private static AtomicLong counterFlights = new AtomicLong();
+    private static final AtomicLong counterFlights = new AtomicLong();
 
-    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<Long, Flight>();
+    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<>();
 
     private static InMemoryFlightRepository instance;
 
@@ -37,6 +37,7 @@ public class InMemoryFlightRepository {
             }
         }
         this.flights.put(flightId, flight);
+        FlightService.getInstance().saveToDB(flight);
         return flight;
     }
 
