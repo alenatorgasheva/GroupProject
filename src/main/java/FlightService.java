@@ -1,5 +1,3 @@
-
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
@@ -7,14 +5,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 
 public class FlightService {
 
     private static FlightService instance;
 
-    private Calendar calendar = Calendar.getInstance();
+    private final Calendar calendar = Calendar.getInstance();
 
     public static synchronized FlightService getInstance() {
         if (instance == null) {
@@ -50,7 +47,7 @@ public class FlightService {
 
     public ArrayList<Flight> decodeData(String data) {
         // конвертирование строки в коллекцию рейсов
-        ArrayList<Flight> flights = new ArrayList<>();
+        ArrayList<Flight> flights = new ArrayList<Flight>();
         String[] rawFlights;
         String[] infoFlight;
 
@@ -69,7 +66,7 @@ public class FlightService {
             Flight newFlight = new Flight(flightNumber, cityFrom, cityTo, timeFrom, timeTo, price, passengersCount);
 
 
-            ArrayList<String> days = new ArrayList<>(Arrays.asList(infoFlight).subList(7, infoFlight.length));
+            ArrayList<String> days = new ArrayList<String>(Arrays.asList(infoFlight).subList(7, infoFlight.length));
             newFlight.setDays(days);
 
             flights.add(newFlight);
@@ -82,9 +79,9 @@ public class FlightService {
         String user = "root";
         String password = "password";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement()) {
-
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
             for (int i = 0; i <= 30; i++) {
                 calendar.add(Calendar.DAY_OF_YEAR, 2);
                 Date date = calendar.getTime();
@@ -106,12 +103,10 @@ public class FlightService {
                             statement.executeUpdate(query);
                         }
                     }
-
                 }
-
-
             }
-
+            statement.close();
+            connection.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

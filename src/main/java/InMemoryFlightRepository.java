@@ -5,7 +5,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class InMemoryFlightRepository {
     private static final AtomicLong counterFlights = new AtomicLong();
 
-    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<Long, Flight>();
 
     private static InMemoryFlightRepository instance;
 
@@ -24,6 +24,10 @@ public class InMemoryFlightRepository {
         }
         return this.flights.values();
 
+    }
+
+    public Flight findFlight(Long id) {
+        return this.flights.get(id);
     }
 
     public Flight save(Flight flight) {
