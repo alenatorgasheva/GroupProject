@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 
-<html lang="en" dir="ltr">
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <link rel="stylesheet" href="../static/css/style.css"/>
+    <link rel="stylesheet" href="../../css/style.css"/>
     <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 </head>
@@ -58,37 +59,26 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr>
+                                        <tr th:if="${flights.empty}">
+                                            <td colspan="10">
+                                                Flight data was not found.
+                                            </td>
+                                        </tr>
+                                        <tr th:each="flight : ${flights}">
                                             <td class="pr-0 pl-4"></td>
                                             <td class="pl-md-0">
                                                 <small class="text-black font-weight-medium d-block">1</small>
                                             </td>
                                             <td>
-                                                <small>AR2502</small>
+                                                <small th:text="${flight.flightNumber}">1</small>
                                             </td>
-                                            <td> НОВОСИБИРСК </td>
+                                            <td th:text="${flight.cityFrom}">1</td>
                                             <td>    </td>
-                                            <td> МОСКВА </td>
-                                            <td> 6:25 </td>
-                                            <td> 7:00 </td>
-                                            <td> 6652 RUB </td>
-                                            <td> ПН ВТ СР ЧТ ПТ</td>
-                                        </tr>
-                                        <tr>
-                                            <td class="pr-0 pl-4"></td>
-                                            <td class="pl-md-0">
-                                                <small class="text-black font-weight-medium d-block">2</small>
-                                            </td>
-                                            <td>
-                                                <small>AR2502</small>
-                                            </td>
-                                            <td> НОВОСИБИРСК </td>
-                                            <td>    </td>
-                                            <td> МОСКВА </td>
-                                            <td> 6:25 </td>
-                                            <td> 7:00 </td>
-                                            <td> 6652 RUB </td>
-                                            <td> ПН ВТ СР ЧТ ПТ</td>
+                                            <td th:text="${flight.cityTo}">1</td>
+                                            <td th:text="${flight.timeFrom}">1</td>
+                                            <td th:text="${flight.timeTo}">1</td>
+                                            <td th:text="${flight.price}">1</td>
+                                            <td th:text="${flight.days}">1</td>
                                         </tr>
                                     </tbody>
                                 </table>
