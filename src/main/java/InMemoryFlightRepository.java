@@ -16,14 +16,8 @@ public class InMemoryFlightRepository {
         return instance;
     }
 
-    public Iterable<Flight> findAllFlights(String path) {
-        if (this.flights.isEmpty()) {
-            for (Flight flight : FlightService.getInstance().readFromCSV(path)) {
-                save(flight);
-            }
-        }
+    public Iterable<Flight> findAllFlights() {
         return this.flights.values();
-
     }
 
     public Flight findFlight(Long id) {
@@ -45,4 +39,10 @@ public class InMemoryFlightRepository {
         return flight;
     }
 
+
+    public void downloadData(String path) {
+        for (Flight flight : FlightService.getInstance().readFromCSV(path)) {
+            save(flight);
+        }
+    }
 }
