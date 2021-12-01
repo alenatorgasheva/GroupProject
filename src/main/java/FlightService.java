@@ -82,13 +82,13 @@ public class FlightService {
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
-            for (int i = 0; i <= 30; i++) {
+            for (int i = 0; i <= 1; i++) {
                 calendar.add(Calendar.DAY_OF_YEAR, 2);
                 Date date = calendar.getTime();
                 String dateWD = new SimpleDateFormat("EE").format(date);
                 String dateFormat = new SimpleDateFormat("yyyy-MM-dd").format(date);
 
-                for (String day : flight.getDays()) {
+                for (String day : flight.getDaysArrayList()) {
                     if (day.equals(dateWD)) {
                         // проверяем, есть ли рейс в бд
                         boolean isFlightExist = false;

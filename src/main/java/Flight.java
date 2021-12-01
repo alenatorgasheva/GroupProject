@@ -32,4 +32,15 @@ public class Flight {
         this.price = price;
     }
 
+    public String getDays() {
+        StringBuilder s = new StringBuilder();
+        for (String day : days) {
+            s.append(day).append(" ");
+        }
+        return s.toString();
+    }
+
+    public ArrayList<String> getDaysArrayList() {
+        return days;
+    }
 }

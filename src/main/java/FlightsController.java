@@ -18,7 +18,7 @@ public class FlightsController {
 	public ModelAndView list() {
 		String path = "src/main/resources/flights.csv";
 		Iterable<Flight> flights = this.flightRepository.findAllFlights(path);
-		return new ModelAndView("admin");
+		return new ModelAndView("admin", "flights", flights);
 	}
 
 
