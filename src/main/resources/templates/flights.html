@@ -48,9 +48,15 @@
                             <div class="table-responsive">
                                 <table class="table table-hover table-sm">
                                     <thead>
+                                        <tr th:if="${flights.empty}">
+                                            <td colspan="9">
+                                                Flight data was not found.
+                                            </td>
+                                        </tr>
+                                    </thead>
+                                    <thead th:if="${!flights.empty}">
                                         <tr class="header">
-                                            <th colspan="2" class="pl-4">Flight No</th>
-                                            <th>Flight Name</th>
+                                            <th colspan="2" class="pl-4">Flight Name</th>
                                             <th>From</th>
                                             <th>-></th>
                                             <th>To</th>
@@ -61,16 +67,8 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr th:if="${flights.empty}">
-                                            <td colspan="10">
-                                                Flight data was not found.
-                                            </td>
-                                        </tr>
                                         <tr th:each="flight : ${flights}">
                                             <td class="pr-0 pl-4"></td>
-                                            <td class="pl-md-0">
-                                                <small class="text-black font-weight-medium d-block">1</small>
-                                            </td>
                                             <td>
                                                 <small th:text="${flight.flightNumber}">1</small>
                                             </td>

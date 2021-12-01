@@ -11,7 +11,7 @@ public class FlightService {
 
     private static FlightService instance;
 
-    private final Calendar calendar = Calendar.getInstance();
+    private Calendar calendar = Calendar.getInstance();
 
     public static synchronized FlightService getInstance() {
         if (instance == null) {
@@ -82,12 +82,11 @@ public class FlightService {
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
-            for (int i = 0; i <= 1; i++) {
-                calendar.add(Calendar.DAY_OF_YEAR, 30);
+            for (int i = 0; i <= 30; i += 1) {
+                calendar.add(Calendar.DAY_OF_YEAR, i);
                 Date date = calendar.getTime();
                 String dateWD = new SimpleDateFormat("EE").format(date);
                 String dateFormat = new SimpleDateFormat("yyyy-MM-dd").format(date);
-
                 for (String day : flight.getDaysArrayList()) {
                     if (day.equals(dateWD)) {
                         // проверяем, есть ли рейс в бд
@@ -98,13 +97,15 @@ public class FlightService {
                             isFlightExist = true;
                         }
                         if (!isFlightExist) {
-                            // добавляем студента в бд
+                            // добавляем рейс в бд
                             query = "INSERT INTO `group_project`.`flights` (`date`, `flight_number`, `city_from`, `city_to`, `time_from`, `time_to`, `price`, `passengers_count`) VALUES ('" + dateFormat + "', '" + flight.getFlightNumber() + "', '" + flight.getCityFrom() + "', '" + flight.getCityTo() + "', '" + flight.getTimeFrom() + "', '" + flight.getTimeTo() + "', '" + flight.getPrice() + "', '" + flight.getPassengersCount() + "');";
                             statement.executeUpdate(query);
                         }
                     }
                 }
+                calendar = Calendar.getInstance();
             }
+
             statement.close();
             connection.close();
         } catch (SQLException e) {

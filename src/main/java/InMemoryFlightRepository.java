@@ -34,7 +34,16 @@ public class InMemoryFlightRepository {
                 counterFlights.set(flightId);
             }
         }
-        this.flights.put(flightId, flight);
+        boolean isFlightSaved = false;
+        for (Flight savedFlight : this.flights.values()) {
+            if (savedFlight.getFlightNumber().equals(flight.getFlightNumber())) {
+                isFlightSaved = true;
+                break;
+            }
+        }
+        if (!isFlightSaved) {
+            this.flights.put(flightId, flight);
+        }
         FlightService.getInstance().saveToDB(flight);
         return flight;
     }
