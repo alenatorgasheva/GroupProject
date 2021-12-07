@@ -21,6 +21,7 @@ public class InMemoryFlightRepository {
     }
 
     public Flight findFlight(Long id) {
+        System.out.println(this.flights.get(id).getFlightNumber());
         return this.flights.get(id);
     }
 
