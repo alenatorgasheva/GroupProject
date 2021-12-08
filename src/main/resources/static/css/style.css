@@ -551,4 +551,23 @@ nav .profile-details i{
   .sidebar.active ~ .home-section nav .profile-details{
     display: none;
   }
+.home-section div.page-container-inner{
+
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    position: relative;
+
+}
+div.page-container-inner input{
+    outline: none;
+    background: #F5F6FA;
+    border: 2px solid #EFEEF1;
+    border-radius: 6px;
+    font-size: 18px;
+    padding: 0 15px;
+    height: 50px;
+    width: 130px;
+    margin: 0 20px;
+    margin-bottom: 25px;
 }
