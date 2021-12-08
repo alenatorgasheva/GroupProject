@@ -307,7 +307,7 @@ nav .profile-details i{
   display: flex;
   justify-content: flex-end;
 }
-.sales-boxes .box .button a{
+.sales-boxes .box .button input{
   color: #fff;
   background-color: #778ee2;
   padding: 4px 12px;

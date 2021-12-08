@@ -1,13 +1,18 @@
+import lombok.Data;
+
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 
+@Data
 public class InMemoryFlightRepository {
     private static final AtomicLong counterFlights = new AtomicLong();
 
     private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<Long, Flight>();
 
     private static InMemoryFlightRepository instance;
+
+    private Long userId = 2L;
 
     public static synchronized InMemoryFlightRepository getInstance() {
         if (instance == null) {

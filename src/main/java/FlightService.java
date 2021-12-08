@@ -119,15 +119,16 @@ public class FlightService {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
             String query = "SELECT * FROM `flights` WHERE (`date` = '" + date + "') AND (`city_from` = '" + cityFrom + "') AND (`city_to` = '" + cityTo + "');";
-            System.out.println(query);
+
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-                System.out.println(resultSet.getDate("date") + " " + resultSet.getInt("passengers_available") + " " + resultSet.getString("flight_number"));
+
                 if (resultSet.getInt("passengers_available") >= passengersCount) {
                     Flight flight = new Flight(resultSet.getString("flight_number"), resultSet.getString("city_from"),
                             resultSet.getString("city_to"), resultSet.getString("time_from"),
                             resultSet.getString("time_to"), resultSet.getDouble("price"),
                             resultSet.getInt("passengers_available"));
+                    flight.setId(resultSet.getLong("id"));
                     addSort(flight, flights);
                 }
             }
