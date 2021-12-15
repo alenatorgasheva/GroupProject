@@ -50,7 +50,7 @@ public class InMemoryFlightRepository {
         if (!isFlightSaved) {
             this.flights.put(flightId, flight);
         }
-        FlightService.getInstance().saveToDB(flight);
+        FlightService.getInstance().saveFlightToDB(flight);
         return flight;
     }
 

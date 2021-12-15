@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Controller
@@ -36,8 +40,8 @@ public class FlightsController {
 	}
 
 	@RequestMapping(value = "admin", method = RequestMethod.POST)
-	public ModelAndView download() {
-		String path = "src/main/resources/flights.csv";
+	public ModelAndView download(@RequestParam("path") String path) {
+		System.out.println(path);
 		this.flightRepository.downloadData(path);
 		Iterable<Flight> flights = this.flightRepository.findAllFlights();
 		return new ModelAndView("admin", "flights", flights);
@@ -46,7 +50,6 @@ public class FlightsController {
 	@RequestMapping(value = "flights", method = RequestMethod.GET)
 	public ModelAndView flights(@ModelAttribute Search search) {
 		Iterable<Flight> flights = search.getResult();
-		System.out.println(flights);
 		return new ModelAndView("flights", "flights", flights);
 	}
 
@@ -59,12 +62,39 @@ public class FlightsController {
 		return new ModelAndView("flights", "flights", flights);
 	}
 
-	@RequestMapping(value = "flights", params = "buy", method = RequestMethod.POST)
-	public ModelAndView buy(@RequestParam("buy") Long flightId, @RequestParam("passengers") int passengersCount,
+	@RequestMapping(value = "order", params = "flight", method = RequestMethod.POST)
+	public ModelAndView book(@RequestParam("flight") Long flightId, @RequestParam("count") int passengersCount,
 							@Valid Search search, BindingResult result, RedirectAttributes redirect) {
-		flightService.buy(flightRepository.getUserId(), flightId, passengersCount);
-		Iterable<Flight> flights = search.getInputResult();
-		return new ModelAndView("redirect:/flights/", "flights", flights);
+		ModelAndView modelAndView = new ModelAndView();
+
+		Flight flight = flightService.findFlight(flightId);
+		modelAndView.addObject("flight", flight);
+
+		modelAndView.addObject("flightId", flightId);
+		modelAndView.addObject("count", passengersCount);
+		modelAndView.addObject("insurance", "false");
+		modelAndView.addObject("autoregistration", "false");
+
+		modelAndView.addObject("today", Calendar.getInstance().getTime());
+
+		modelAndView.setViewName("book");
+		return modelAndView;
+	}
+
+	@RequestMapping(value = "order", params = "buy", method = RequestMethod.POST)
+	public ModelAndView example(@RequestParam Map allParams) {
+		System.out.println(allParams);
+		int count = Integer.parseInt((String) allParams.get("count"));
+		Long flightId = Long.parseLong((String) allParams.get("buy"));
+		Long orderId = flightService.buy(2L, flightId, count);
+		for (int i = 1; i <= count; i++) {
+			Passenger passenger = new Passenger(String.valueOf(allParams.get("lastName-" + i)),
+					String.valueOf(allParams.get("firstName-" + i)), String.valueOf(allParams.get("passport-" + i)),
+					String.valueOf(allParams.get("birthdayDate-" + i)), String.valueOf(allParams.get("luggage-" + i)),
+					String.valueOf(allParams.get("insurance")), String.valueOf(allParams.get("autoregistration")));
+			flightService.savePassengerToDB(passenger, orderId);
+		}
+		return new ModelAndView("login");
 	}
 
 }

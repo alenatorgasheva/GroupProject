@@ -78,7 +78,7 @@ public class FlightService {
         return flights;
     }
 
-    public void saveToDB(Flight flight) {
+    public void saveFlightToDB(Flight flight) {
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
@@ -113,6 +113,46 @@ public class FlightService {
         }
     }
 
+    public void savePassengerToDB(Passenger passenger, Long orderId) {
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "INSERT INTO `group_project`.`passengers` (`order_id`, `last_name`, `first_name`, `passport`, `birthday_date`, `luggage`, `insurance`, `autoregistration`) " +
+                    "VALUES ('" + orderId + "', '" + passenger.getLastName() + "', '" + passenger.getFirstName() + "', '" + passenger.getPassport() + "', '" + passenger.getBirthdayDate() + "', '" + passenger.getLuggage() + "', '" + passenger.getInsurance() + "', '" + passenger.getAutoregistration() + "');";
+            statement.executeUpdate(query);
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Flight findFlight(Long flightId) {
+        Flight flight = null;
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT * FROM `flights` WHERE (`id` = '" + flightId + "');";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                flight = new Flight(resultSet.getString("flight_number"), resultSet.getString("city_from"),
+                        resultSet.getString("city_to"), resultSet.getString("time_from"),
+                        resultSet.getString("time_to"), resultSet.getDouble("price"),
+                        resultSet.getInt("passengers_available"));
+                flight.setId(flightId);
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return flight;
+    }
+
     public ArrayList<Flight> findFlightsInDB(String cityFrom, String cityTo, String date, int passengersCount) {
         ArrayList<Flight> flights = new ArrayList<Flight>();
         try {
@@ -122,7 +162,6 @@ public class FlightService {
 
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
-
                 if (resultSet.getInt("passengers_available") >= passengersCount) {
                     Flight flight = new Flight(resultSet.getString("flight_number"), resultSet.getString("city_from"),
                             resultSet.getString("city_to"), resultSet.getString("time_from"),
@@ -163,18 +202,24 @@ public class FlightService {
         }
     }
 
+    public Long buy(Long userId, Long flightId, int passengersCount) {
+        Long orderId = null;
 
-    public void buy(Long userId, Long flightId, int passengersCount) {
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
 
             String query = "INSERT INTO `group_project`.`orders` (`user_id`, `flight_id`, `passengers_count`) VALUES ('" + userId + "', '" + flightId + "', '" + passengersCount + "');";
             statement.executeUpdate(query);
+            query = "SELECT * FROM `group_project`.`orders` WHERE (`user_id` = '" + userId + "') AND (`flight_id` = '" + flightId + "') AND (`passengers_count` = '" + passengersCount + "');";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                orderId = resultSet.getLong("id");
+            }
 
             int passengersAvailable = 0;
             query = "SELECT * FROM `group_project`.`flights` WHERE (`id` = '" + flightId + "');";
-            ResultSet resultSet = statement.executeQuery(query);
+            resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 passengersAvailable = resultSet.getInt("passengers_available") - passengersCount;
             }
@@ -187,6 +232,7 @@ public class FlightService {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return orderId;
     }
 
 }
