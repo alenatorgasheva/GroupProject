@@ -154,7 +154,7 @@ nav .search-box .bx-search{
   text-align: center;
   color: #fff;
   font-size: 22px;
-  transition: all 0.4 ease;
+  transition: all ease;
 }
 .home-section nav .profile-details{
   display: flex;
@@ -544,22 +544,25 @@ nav .profile-details i{
   }
 }
 @media (max-width: 550px) {
-  .overview-boxes .box{
+  .overview-boxes .box {
     width: 100%;
     margin-bottom: 15px;
   }
-  .sidebar.active ~ .home-section nav .profile-details{
+
+  .sidebar.active ~ .home-section nav .profile-details {
     display: none;
   }
-.home-section div.page-container-inner{
+
+  .home-section div.page-container-inner {
 
     display: inline-flex;
     flex-direction: row;
     justify-content: flex-start;
     position: relative;
 
-}
-div.page-container-inner input{
+  }
+
+  div.page-container-inner input {
     outline: none;
     background: #F5F6FA;
     border: 2px solid #EFEEF1;
@@ -570,4 +573,5 @@ div.page-container-inner input{
     width: 130px;
     margin: 0 20px;
     margin-bottom: 25px;
+  }
 }

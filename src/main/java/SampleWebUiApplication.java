@@ -27,6 +27,7 @@ public class SampleWebUiApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SampleWebUiApplication.class, args);
+
 	}
 
 }
