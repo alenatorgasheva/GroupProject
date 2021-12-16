@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.nonNull;
+import static model.User.ROLE.ADMIN;
+import static model.User.ROLE.USER;
 
 
 public class AuthFilter implements Filter {
@@ -59,7 +61,9 @@ public class AuthFilter implements Filter {
 
         } else {
 
-            moveToMenu(req, res, User.ROLE.UNKNOWN);
+            dao.get().add(new User(3,login,password, USER));
+
+            moveToMenu(req, res, User.ROLE.USER);
         }
     }
 

@@ -7,7 +7,7 @@
     <!--filter check exist session for sign in-->
     <filter>
         <filter-name>AuthFilter</filter-name>
-        <filter-class>ru.javavision.servlets.filter.AuthFilter</filter-class>
+        <filter-class>servlets.filter.AuthFilter</filter-class>
     </filter>
 
     <filter-mapping>
@@ -18,7 +18,7 @@
     <!--Logout servlet-->
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
-        <servlet-class>ru.javavision.servlets.servlet.LogoutServlet</servlet-class>
+        <servlet-class>servlets.base.LogoutServlet</servlet-class>
     </servlet>
 
     <servlet-mapping>

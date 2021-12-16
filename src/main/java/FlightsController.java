@@ -1,3 +1,4 @@
+import model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -7,6 +8,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -62,6 +66,17 @@ public class FlightsController {
 		return new ModelAndView("flights", "flights", flights);
 	}
 
+	@RequestMapping(value = "login", params = "sing_in", method = RequestMethod.POST)
+	public ModelAndView sing_in(@Valid Search search, BindingResult result,final HttpServletRequest req,
+								final HttpServletResponse res,
+								final User.ROLE role) {
+		if (role.equals(User.ROLE.ADMIN)) {
+			return new ModelAndView("admin", "admin", admin());
+		}
+		Iterable<Flight> flights = search.getInputResult();
+		return new ModelAndView("flights", "flights", flights);
+	}
+
 	@RequestMapping(value = "order", params = "flight", method = RequestMethod.POST)
 	public ModelAndView book(@RequestParam("flight") Long flightId, @RequestParam("count") int passengersCount,
 							@Valid Search search, BindingResult result, RedirectAttributes redirect) {
@@ -80,6 +95,8 @@ public class FlightsController {
 		modelAndView.setViewName("book");
 		return modelAndView;
 	}
+
+
 
 	@RequestMapping(value = "order", params = "buy", method = RequestMethod.POST)
 	public ModelAndView example(@RequestParam Map allParams) {
