@@ -26,7 +26,7 @@
         </a>
       </li>
       <li class="log_out">
-        <a href="login">
+        <a href="sign-out">
           <i class='bx bx-log-out'></i>
           <span class="links_name">Log out</span>
         </a>
@@ -41,7 +41,7 @@
           <span class="dashboard">Airline reservation system</span>
         </div>
         <div>
-          <a href="#">example@mail.ru</a>
+          <a href="#" th:text="${email}">example@mail.ru</a>
         </div>
       </nav>
 
@@ -59,31 +59,31 @@
 
                       <div class="payment-form">
                         <form action="#" th:each="i: ${#numbers.sequence(1, count)}" method="post">
-                          <h4 class="section-heading" th:text="'Данные о пассажире ' + ${i} + '.'">Данные о пассажире</h4>
+                          <h4 class="section-heading" th:text="'Information about passenger ' + ${i} + '.'">Information about passenger</h4>
 
                           <div class="cardholder-name">
-                            <label for="cardholder-name" class="label-default">Фамилия</label>
+                            <label for="cardholder-name" class="label-default">Surname</label>
                             <input type="text"
                                    th:attr="name = 'lastName-' + ${i}" id="cardholder-name_1" class="input-default"
                                    placeholder="Ivanov"/>
                           </div>
                           <div class="cardholder-name">
-                            <label for="cardholder-name" class="label-default">Имя</label>
+                            <label for="cardholder-name" class="label-default">Name</label>
                             <input type="text"
                                    th:attr="name = 'firstName-' + ${i}" id="cardholder-name" class="input-default"
                                    placeholder="Ivan"/>
                           </div>
 
                           <div class="card-number">
-                            <label for="card-number" class="label-default">Номер паспорта</label>
+                            <label for="card-number" class="label-default">Passport number</label>
                             <input type="number"
                                    th:attr="name = 'passport-' + ${i}" id="card-number" class="input-default"
                                    placeholder="0000000000"/>
                           </div>
 
                           <div class="card-number">
-                            <label for="card-number" class="label-default">Дата рождения</label>
-                            <input type="date" min="1921-12-15" max="2021-12-15"
+                            <label for="card-number" class="label-default">Birthday Date</label>
+                            <input type="date" min="1921-12-15" th:max="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}"
                                    th:attr="name = 'birthdayDate-' + ${i}" id="birth" class="input-default"/>
                           </div>
 
@@ -91,7 +91,7 @@
                             <label>
                               <input type="checkbox"
                                      th:attr="name = 'luggage-' + ${i}"/>
-                              <span>Добавить багаж + 2500 руб</span>
+                              <span>Add luggage + 2500 RUB</span>
                             </label>
                           </p>
                         </form>
@@ -101,7 +101,7 @@
                         <label>
                           <input type="checkbox"
                                  name="insurance"/>
-                          <span>Добавить страховку на всех пассажиров + 600 руб/чел</span>
+                          <span>Add insurance for passengers + 600 RUB/Per</span>
                         </label>
                       </p>
 
@@ -110,22 +110,22 @@
                           <input type="checkbox"
                                  name="autoregistration"
                                  th:checked="${autoregistration}"/>
-                          <span>Добавить авторегистрацию на всех пассажиров + 50 руб/чел</span>
+                          <span>Add auto-registration for all passengers + 50 RUB/per</span>
                         </label>
                       </p>
                     </section>
 
                     <section class="cart">
                       <div class="cart-item-box">
-                        <h2 class="section-heading">Общая сумма</h2>
+                        <h2 class="section-heading">Total amount</h2>
 
                         <div class="product-card">
                           <div class="card">
                             <div class="detail">
-                              <h4 class="product-name">Авиабилеты</h4>
+                              <h4 class="product-name">Air ticket</h4>
                               <div class="wrapper">
                                 <div class="price">
-                                  <span id="price" th:text="${flight.price}">0</span> руб.
+                                  <span id="price" th:text="${flight.price}">0</span> RUB
                                 </div>
                                 <div class="product-qty">
                                   <span id="quantity" th:text="${count}">1</span>
@@ -136,31 +136,48 @@
                         </div>
 
                         <div class="product-card">
-                          <div class="card">
+                          <div class="card" th:if="${insurance != null}">
                             <div class="detail">
-                              <h4 class="product-name">Багаж</h4>
+                              <h4 class="product-name">Luggage</h4>
                               <div class="wrapper">
                                 <div class="price">
-                                  <span id="price">0</span> руб.
+                                  <span id="price" th:if="${insurance == null}">0 rub.</span>
+                                  <span id="price" th:text="${(count * 600)} + ' rub.'"></span>
                                 </div>
                                 <div class="product-qty">
-                                  <span id="quantity">1</span>
+                                  <span id="quantity" th:text="${' x ' + count}">1</span>
                                 </div>
                               </div>
                             </div>
                           </div>
                         </div>
 
-                        <div class="product-card">
+                        <div class="product-card" th:if="${insurance != null}">
                           <div class="card">
                             <div class="detail">
-                              <h4 class="product-name">Страховка</h4>
+                              <h4 class="product-name">Insurance</h4>
                               <div class="wrapper">
                                 <div class="price">
-                                  <span id="price">0</span> руб.
+                                  <span id="price" th:text="${(count * 600)} + ' rub.'"></span>
                                 </div>
                                 <div class="product-qty">
-                                  <span id="quantity">1</span>
+                                  <span id="quantity" th:text="${' x ' + count}">1</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="product-card" th:if="${autoregistration != null}">
+                          <div class="card">
+                            <div class="detail">
+                              <h4 class="product-name">Auto-registration</h4>
+                              <div class="wrapper">
+                                <div class="price">
+                                  <span id="price" th:text="${(count * 50)} + ' rub.'"></span>
+                                </div>
+                                <div class="product-qty">
+                                  <span id="quantity" th:text="${' x ' + count}">1</span>
                                 </div>
                               </div>
                             </div>
@@ -173,16 +190,16 @@
                           <div class="total">
                             <span>Total</span>
                             <span>
-                            <span id="total" th:text="${(count * flight.price)}"></span> rub.
-                          </span>
+                              <span id="total" th:if="${flights == null or flights.isEmpty()}" th:text="${(count * flight.price)}"></span> rub.
+                            </span>
                           </div>
 
                           <button class="btn btn-primary" href="example">
-                            <span id="payAmount">ОФОРМИТЬ</span>
+                            <span id="payAmount">BUY</span>
                           </button>
 
                           <button class="btnn btnn-primary">
-                            <span id="cancel">ОТМЕНА</span>
+                            <span id="cancel">CANCEL</span>
                           </button>
                         </div>
                       </div>

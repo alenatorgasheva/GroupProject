@@ -24,6 +24,32 @@ public class FlightService {
         return instance;
     }
 
+    public User findUser(User userFlight) {
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT * FROM `users` WHERE (`login` = '" + userFlight.getLogin() + "') AND (`password` = '" + userFlight.getPassword() + "');";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                userFlight.setId(resultSet.getLong("id"));
+                String role = resultSet.getString("role");
+                if (role.equals("admin")) {
+                    userFlight.setRole(User.ROLE.ADMIN);
+                } else {
+                    userFlight.setRole(User.ROLE.USER);
+                }
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return userFlight;
+    }
+
     public ArrayList<Flight> readFromCSV(String path) {
         FileReader fileIn = null;
         StringBuilder data = new StringBuilder();
@@ -51,7 +77,7 @@ public class FlightService {
 
     public ArrayList<Flight> decodeData(String data) {
         // конвертирование строки в коллекцию рейсов
-        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Flight> flights = new ArrayList<>();
         String[] rawFlights;
         String[] infoFlight;
 
@@ -70,7 +96,7 @@ public class FlightService {
             Flight newFlight = new Flight(flightNumber, cityFrom, cityTo, timeFrom, timeTo, price, passengersCount);
 
 
-            ArrayList<String> days = new ArrayList<String>(Arrays.asList(infoFlight).subList(7, infoFlight.length));
+            ArrayList<String> days = new ArrayList<>(Arrays.asList(infoFlight).subList(7, infoFlight.length));
             newFlight.setDays(days);
 
             flights.add(newFlight);
@@ -154,12 +180,13 @@ public class FlightService {
     }
 
     public ArrayList<Flight> findFlightsInDB(String cityFrom, String cityTo, String date, int passengersCount) {
-        ArrayList<Flight> flights = new ArrayList<Flight>();
+        ArrayList<Flight> flights = new ArrayList<>();
         try {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
-            String query = "SELECT * FROM `flights` WHERE (`date` = '" + date + "') AND (`city_from` = '" + cityFrom + "') AND (`city_to` = '" + cityTo + "');";
 
+            String query = "SELECT * FROM `flights` WHERE (`date` = '" + date + "') AND (`city_from` = '" + cityFrom + "') AND (`city_to` = '" + cityTo + "');";
+            System.out.println(query);
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 if (resultSet.getInt("passengers_available") >= passengersCount) {

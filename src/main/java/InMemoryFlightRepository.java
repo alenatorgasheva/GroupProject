@@ -8,11 +8,11 @@ import java.util.concurrent.atomic.AtomicLong;
 public class InMemoryFlightRepository {
     private static final AtomicLong counterFlights = new AtomicLong();
 
-    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<Long, Flight>();
+    private final ConcurrentMap<Long, Flight> flights = new ConcurrentHashMap<>();
 
     private static InMemoryFlightRepository instance;
 
-    private Long userId = 2L;
+    private final User user = new User();
 
     public static synchronized InMemoryFlightRepository getInstance() {
         if (instance == null) {
@@ -26,11 +26,14 @@ public class InMemoryFlightRepository {
     }
 
     public Flight findFlight(Long id) {
-        System.out.println(this.flights.get(id).getFlightNumber());
         return this.flights.get(id);
     }
 
-    public Flight save(Flight flight) {
+    public User getFlight() {
+        return this.user;
+    }
+
+    public Flight saveFlight(Flight flight) {
         Long flightId = flight.getId();
         if (flightId == null) {
             flightId = counterFlights.incrementAndGet();
@@ -54,10 +57,22 @@ public class InMemoryFlightRepository {
         return flight;
     }
 
+    public User saveUser(User newUser) {
+        user.setId(newUser.getId());
+        user.setLogin(newUser.getLogin());
+        user.setPassword(newUser.getPassword());
+        user.setRole(newUser.getRole());
+        return this.user;
+    }
 
     public void downloadData(String path) {
         for (Flight flight : FlightService.getInstance().readFromCSV(path)) {
-            save(flight);
+            saveFlight(flight);
         }
+    }
+
+    public InMemoryFlightRepository removeAll() {
+        instance = new InMemoryFlightRepository();
+        return instance;
     }
 }

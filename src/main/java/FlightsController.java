@@ -1,4 +1,3 @@
-import model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -9,12 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.Map;
 
 
@@ -22,7 +16,7 @@ import java.util.Map;
 @RequestMapping("/")
 public class FlightsController {
 
-	private final InMemoryFlightRepository flightRepository;
+	private InMemoryFlightRepository flightRepository;
 
 	private final FlightService flightService;
 
@@ -32,74 +26,164 @@ public class FlightsController {
 		this.flightService = FlightService.getInstance();
 	}
 
+	@RequestMapping()
+	public ModelAndView start() {
+		return new ModelAndView("login");
+	}
+
 	@RequestMapping("login")
 	public ModelAndView login() {
 		return new ModelAndView("login");
 	}
 
+	@RequestMapping(value = "sign-in", method = RequestMethod.GET)
+	public ModelAndView singIn(@RequestParam Map allParams, @ModelAttribute Search search) {
+		ModelAndView modelAndView = new ModelAndView();
+
+		User user = new User(String.valueOf(allParams.get("email")), String.valueOf(allParams.get("password")));
+		user = flightService.findUser(user);
+
+		if (user.getRole() != null) {
+			flightRepository.saveUser(user);
+
+			if (user.getRole().equals(User.ROLE.ADMIN)) {
+				Iterable<Flight> flights = this.flightRepository.findAllFlights();
+				modelAndView.setViewName("admin");
+				modelAndView.addObject("flights", flights);
+			} else {
+				Iterable<Flight> flights = search.getResult();
+				modelAndView.setViewName("flights");
+				modelAndView.addObject("flights", flights);
+				modelAndView.addObject("email", user.getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
+	}
+
+	@RequestMapping(value = "sign-out")
+	public ModelAndView singOut() {
+		flightRepository = flightRepository.removeAll();
+		return new ModelAndView("login");
+	}
+
 	@RequestMapping("admin")
-	public ModelAndView admin() {
-		Iterable<Flight> flights = this.flightRepository.findAllFlights();
-		return new ModelAndView("admin", "flights", flights);
+	public ModelAndView admin(@ModelAttribute Search search) {
+		ModelAndView modelAndView = new ModelAndView();
+
+		if (flightRepository.getUser().getRole() != null) {
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				Iterable<Flight> flights = this.flightRepository.findAllFlights();
+				modelAndView.setViewName("admin");
+				modelAndView.addObject("flights", flights);
+			} else {
+				Iterable<Flight> flights = search.getResult();
+				modelAndView.setViewName("flights");
+				modelAndView.addObject("flights", flights);
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
 	}
 
 	@RequestMapping(value = "admin", method = RequestMethod.POST)
-	public ModelAndView download(@RequestParam("path") String path) {
+	public ModelAndView download(@RequestParam("path") String path, @ModelAttribute Search search) {
 		System.out.println(path);
-		this.flightRepository.downloadData(path);
-		Iterable<Flight> flights = this.flightRepository.findAllFlights();
-		return new ModelAndView("admin", "flights", flights);
+		ModelAndView modelAndView = new ModelAndView();
+
+		if (flightRepository.getUser().getRole() != null) {
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				this.flightRepository.downloadData(path);
+				Iterable<Flight> flights = this.flightRepository.findAllFlights();
+				modelAndView.setViewName("admin");
+				modelAndView.addObject("flights", flights);
+			} else {
+				Iterable<Flight> flights = search.getResult();
+				modelAndView.setViewName("flights");
+				modelAndView.addObject("flights", flights);
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
 	}
 
 	@RequestMapping(value = "flights", method = RequestMethod.GET)
 	public ModelAndView flights(@ModelAttribute Search search) {
-		Iterable<Flight> flights = search.getResult();
-		return new ModelAndView("flights", "flights", flights);
+		ModelAndView modelAndView = new ModelAndView();
+
+		if (flightRepository.getUser().getRole() != null) {
+			Iterable<Flight> flights = search.getResult();
+			modelAndView.setViewName("flights");
+			modelAndView.addObject("flights", flights);
+
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				modelAndView.addObject("email", "admin");
+			} else {
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
 	}
 
 	@RequestMapping(value = "flights", params = "search", method = RequestMethod.POST)
 	public ModelAndView find(@Valid Search search, BindingResult result) {
-		if (result.hasErrors()) {
-			return new ModelAndView("flights", "flightsErrors", result.getAllErrors());
-		}
-		Iterable<Flight> flights = search.getInputResult();
-		return new ModelAndView("flights", "flights", flights);
-	}
+		ModelAndView modelAndView = new ModelAndView();
 
-	@RequestMapping(value = "login", params = "sing_in", method = RequestMethod.POST)
-	public ModelAndView sing_in(@Valid Search search, BindingResult result,final HttpServletRequest req,
-								final HttpServletResponse res,
-								final User.ROLE role) {
-		if (role.equals(User.ROLE.ADMIN)) {
-			return new ModelAndView("admin", "admin", admin());
+		if (flightRepository.getUser().getRole() != null) {
+			if (result.hasErrors()) {
+				modelAndView.addObject("flightsErrors", result.getAllErrors());
+			} else {
+				Iterable<Flight> flights = search.getInputResult();
+				modelAndView.setViewName("flights");
+				modelAndView.addObject("flights", flights);
+
+				if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+					modelAndView.addObject("email", "admin");
+				} else {
+					modelAndView.addObject("email", flightRepository.getUser().getLogin());
+				}
+			}
+		} else {
+			modelAndView.setViewName("login");
 		}
-		Iterable<Flight> flights = search.getInputResult();
-		return new ModelAndView("flights", "flights", flights);
+		return modelAndView;
 	}
 
 	@RequestMapping(value = "order", params = "flight", method = RequestMethod.POST)
 	public ModelAndView book(@RequestParam("flight") Long flightId, @RequestParam("count") int passengersCount,
 							@Valid Search search, BindingResult result, RedirectAttributes redirect) {
 		ModelAndView modelAndView = new ModelAndView();
+		if (flightRepository.getUser().getRole() != null) {
+			Flight flight = flightService.findFlight(flightId);
+			modelAndView.addObject("flight", flight);
 
-		Flight flight = flightService.findFlight(flightId);
-		modelAndView.addObject("flight", flight);
+			modelAndView.addObject("flightId", flightId);
+			modelAndView.addObject("count", passengersCount);
+			modelAndView.addObject("insurance", null);
+			modelAndView.addObject("autoregistration", null);
 
-		modelAndView.addObject("flightId", flightId);
-		modelAndView.addObject("count", passengersCount);
-		modelAndView.addObject("insurance", "false");
-		modelAndView.addObject("autoregistration", "false");
+			modelAndView.setViewName("book");
 
-		modelAndView.addObject("today", Calendar.getInstance().getTime());
-
-		modelAndView.setViewName("book");
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				modelAndView.addObject("email", "admin");
+			} else {
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
 		return modelAndView;
 	}
 
-
-
 	@RequestMapping(value = "order", params = "buy", method = RequestMethod.POST)
-	public ModelAndView example(@RequestParam Map allParams) {
+	public ModelAndView example(@RequestParam Map allParams, @ModelAttribute Search search) {
 		System.out.println(allParams);
 		int count = Integer.parseInt((String) allParams.get("count"));
 		Long flightId = Long.parseLong((String) allParams.get("buy"));
@@ -111,7 +195,22 @@ public class FlightsController {
 					String.valueOf(allParams.get("insurance")), String.valueOf(allParams.get("autoregistration")));
 			flightService.savePassengerToDB(passenger, orderId);
 		}
-		return new ModelAndView("login");
-	}
 
+		ModelAndView modelAndView = new ModelAndView();
+
+		if (flightRepository.getUser().getRole() != null) {
+			Iterable<Flight> flights = search.getResult();
+			modelAndView.setViewName("flights");
+			modelAndView.addObject("flights", flights);
+
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				modelAndView.addObject("email", "admin");
+			} else {
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
+	}
 }

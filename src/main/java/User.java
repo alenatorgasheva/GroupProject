@@ -1,17 +1,15 @@
-package model;
-
 import lombok.Data;
 
 @Data
 public class User {
 
-    private int id;
+    private Long id;
 
     private String login;
 
     private String password;
 
-    private ROLE role;
+    private ROLE role = null;
 
     public User() {}
 
@@ -20,7 +18,7 @@ public class User {
         this.password = password;
     }
 
-    public User(int id, String login, String password, ROLE role) {
+    public User(Long id, String login, String password, ROLE role) {
         this.id = id;
         this.login = login;
         this.password = password;
@@ -28,6 +26,6 @@ public class User {
     }
 
     public enum ROLE {
-        USER, ADMIN, UNKNOWN
+        USER, ADMIN
     }
 }
