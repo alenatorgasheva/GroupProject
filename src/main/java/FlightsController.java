@@ -9,6 +9,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.Map;
 
 
@@ -158,7 +159,7 @@ public class FlightsController {
 
 	@RequestMapping(value = "order", params = "flight", method = RequestMethod.POST)
 	public ModelAndView book(@RequestParam("flight") Long flightId, @RequestParam("count") int passengersCount,
-							@Valid Search search, BindingResult result, RedirectAttributes redirect) {
+							 @Valid Search search, BindingResult result, RedirectAttributes redirect) {
 		ModelAndView modelAndView = new ModelAndView();
 		if (flightRepository.getUser().getRole() != null) {
 			Flight flight = flightService.findFlight(flightId);
@@ -172,9 +173,9 @@ public class FlightsController {
 			modelAndView.setViewName("book");
 
 			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
-				modelAndView.addObject("email", "admin");
+				modelAndView.addObject("user", "admin");
 			} else {
-				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+				modelAndView.addObject("user", flightRepository.getUser());
 			}
 		} else {
 			modelAndView.setViewName("login");
@@ -183,18 +184,23 @@ public class FlightsController {
 	}
 
 	@RequestMapping(value = "order", params = "buy", method = RequestMethod.POST)
-	public ModelAndView example(@RequestParam Map allParams, @ModelAttribute Search search) {
+	public ModelAndView buy(@RequestParam Map allParams, @ModelAttribute Search search) {
 		System.out.println(allParams);
 		int count = Integer.parseInt((String) allParams.get("count"));
 		Long flightId = Long.parseLong((String) allParams.get("buy"));
-		Long orderId = flightService.buy(2L, flightId, count);
+		Long orderId = flightService.buy(flightRepository.getUser().getId(), flightId, count);
+
+		double totalPrice = flightService.findFlight(flightId).getPrice() * count;
 		for (int i = 1; i <= count; i++) {
 			Passenger passenger = new Passenger(String.valueOf(allParams.get("lastName-" + i)),
 					String.valueOf(allParams.get("firstName-" + i)), String.valueOf(allParams.get("passport-" + i)),
-					String.valueOf(allParams.get("birthdayDate-" + i)), String.valueOf(allParams.get("luggage-" + i)),
+					String.valueOf(allParams.get("birthdayDate-" + i)), String.valueOf(allParams.get("luggage")),
 					String.valueOf(allParams.get("insurance")), String.valueOf(allParams.get("autoregistration")));
+
 			flightService.savePassengerToDB(passenger, orderId);
+			totalPrice += 2500 * passenger.getLuggage() + 600 * passenger.getInsurance() + 50 * passenger.getAutoregistration();
 		}
+		flightService.updateOrderPrice(orderId, totalPrice);
 
 		ModelAndView modelAndView = new ModelAndView();
 
@@ -207,6 +213,41 @@ public class FlightsController {
 				modelAndView.addObject("email", "admin");
 			} else {
 				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+		} else {
+			modelAndView.setViewName("login");
+		}
+		return modelAndView;
+	}
+
+	@RequestMapping(value = "example")
+	public ModelAndView example(@ModelAttribute("search") Search search, @ModelAttribute("id") Long orderId) {
+		ModelAndView modelAndView = new ModelAndView();
+
+		if (flightRepository.getUser().getRole() != null) {
+			if (flightRepository.getUser().getRole().equals(User.ROLE.ADMIN)) {
+				modelAndView.addObject("email", "admin");
+			} else {
+				modelAndView.addObject("email", flightRepository.getUser().getLogin());
+			}
+
+			if (!(flightRepository.getUser().getId().equals(flightService.getUserId(orderId)))) {
+				Iterable<Flight> flights = search.getResult();
+				modelAndView.addObject("flights", flights);
+
+				modelAndView.setViewName("flights");
+			} else {
+				Map<String, Object> info = flightService.getOrderInfo(orderId);
+				System.out.println(info);
+				Price price = (Price) info.get("price");
+				Flight flight = (Flight) info.get("flight");
+				ArrayList<Passenger> passengers = (ArrayList<Passenger>) info.get("passengers");
+
+				modelAndView.addObject("price", price);
+				modelAndView.addObject("flight", flight);
+				modelAndView.addObject("passengers", passengers);
+
+				modelAndView.setViewName("order");
 			}
 		} else {
 			modelAndView.setViewName("login");

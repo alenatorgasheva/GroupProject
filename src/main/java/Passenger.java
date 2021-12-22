@@ -26,22 +26,20 @@ public class Passenger {
         this.firstName = firstName;
         this.passport = passport;
         this.birthdayDate = birthdayDate;
-        if (luggage.equals("on")) {
+        if ((luggage.equals("on")) || (luggage.equals("1"))) {
             this.luggage = 1;
         } else {
             this.luggage = 0;
         }
-        if (insurance.equals("on")) {
+        if ((insurance.equals("on")) || (insurance.equals("1"))) {
             this.insurance = 1;
         } else {
             this.insurance = 0;
         }
-        if (autoregistration.equals("on")) {
+        if ((autoregistration.equals("on")) || (autoregistration.equals("1"))) {
             this.autoregistration = 1;
         } else {
             this.autoregistration = 0;
         }
-
-
     }
 }

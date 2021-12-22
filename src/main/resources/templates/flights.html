@@ -121,7 +121,6 @@
                                                     <tr th:each="flight : ${flights}">
                                                         <form id="buy"
                                                               th:action="@{/order(flight=${flight.id}, count=${search.passengersCount})}"
-                                                              action="#"
                                                               method="post">
                                                             <td th:text="${flight.cityFrom}">1</td>
                                                             <td th:text="${flight.cityTo}">1</td>

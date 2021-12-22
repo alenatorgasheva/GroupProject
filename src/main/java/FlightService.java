@@ -1,9 +1,7 @@
 import java.io.FileReader;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
+import java.util.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -236,7 +234,7 @@ public class FlightService {
             Connection connection = DriverManager.getConnection(url, user, password);
             Statement statement = connection.createStatement();
 
-            String query = "INSERT INTO `group_project`.`orders` (`user_id`, `flight_id`, `passengers_count`) VALUES ('" + userId + "', '" + flightId + "', '" + passengersCount + "');";
+            String query = "INSERT INTO `group_project`.`orders` (`user_id`, `flight_id`, `passengers_count`, `total_price`) VALUES ('" + userId + "', '" + flightId + "', '" + passengersCount + "', '" + 0 + "');";
             statement.executeUpdate(query);
             query = "SELECT * FROM `group_project`.`orders` WHERE (`user_id` = '" + userId + "') AND (`flight_id` = '" + flightId + "') AND (`passengers_count` = '" + passengersCount + "');";
             ResultSet resultSet = statement.executeQuery(query);
@@ -262,4 +260,100 @@ public class FlightService {
         return orderId;
     }
 
+    public void updateOrderPrice(Long orderId, double totalPrice) {
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "UPDATE `group_project`.`orders` SET `total_price` = '" + totalPrice + "' WHERE (`id` = '" + orderId + "');";
+            statement.executeUpdate(query);
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map<String, Object> getOrderInfo(Long orderId) {
+        HashMap<String, Object> info = new HashMap<>();
+
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT * FROM `group_project`.`orders` WHERE (`id` = '" + orderId + "');";
+            ResultSet resultSet = statement.executeQuery(query);
+            long flightId = 0;
+            double totalPrice = 0;
+            while (resultSet.next()) {
+                flightId = resultSet.getLong("flight_id");
+            }
+
+            query = "SELECT * FROM `group_project`.`flights` WHERE (`id` = '" + flightId + "');";
+            resultSet = statement.executeQuery(query);
+            Flight flight = new Flight();
+            while (resultSet.next()) {
+                flight.setId(flightId);
+                flight.setFlightNumber(resultSet.getString("flight_number"));
+                flight.setCityFrom(resultSet.getString("city_from"));
+                flight.setCityTo(resultSet.getString("city_to"));
+                flight.setTimeFrom(resultSet.getString("time_from"));
+                flight.setTimeTo(resultSet.getString("time_to"));
+                flight.setPrice(resultSet.getDouble("price"));
+                flight.setPassengersCount(resultSet.getInt("passengers_available"));
+            }
+            info.put("flight", flight);
+
+            ArrayList<Passenger> passengers = new ArrayList<>();
+            Price price = new Price(flight.getPrice(), 2500.0, 600.0, 50.0);
+            query = "SELECT * FROM `group_project`.`passengers` WHERE (`order_id` = '" + orderId + "');";
+            resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                Passenger passenger = new Passenger(resultSet.getString("last_name"),
+                        resultSet.getString("first_name"), resultSet.getString("passport"),
+                        resultSet.getString("birthday_date"), resultSet.getString("luggage"),
+                        resultSet.getString("insurance"), resultSet.getString("autoregistration"));
+                passenger.setId(resultSet.getLong("id"));
+                passengers.add(passenger);
+
+                price.addTicketsCount();
+                price.addLuggageCount(passenger.getLuggage());
+                price.addInsuranceCount(passenger.getInsurance());
+                price.addAutoregistrationCount(passenger.getAutoregistration());
+            }
+            price.setTicketCount(passengers.size());
+
+            info.put("passengers", passengers);
+
+            info.put("price", price);
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return info;
+    }
+
+    public Long getUserId(Long orderId) {
+        Long userId = null;
+
+        try {
+            Connection connection = DriverManager.getConnection(url, user, password);
+            Statement statement = connection.createStatement();
+
+            String query = "SELECT * FROM `group_project`.`orders` WHERE (`id` = '" + orderId + "');";
+            ResultSet resultSet = statement.executeQuery(query);
+            while (resultSet.next()) {
+                userId = resultSet.getLong("user_id");
+            }
+
+            statement.close();
+            connection.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return userId;
+    }
 }

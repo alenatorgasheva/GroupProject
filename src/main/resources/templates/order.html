@@ -33,7 +33,7 @@
     </li>
   </ul>
 </div>
-<form th:action="@{/order(buy=${flight.id}, count=${count})}" method="post">
+<form action="flights">
   <section class="home-section">
     <nav>
       <div class="sidebar-button">
@@ -58,59 +58,51 @@
                     <h2 class="section-heading" th:text="${flight.flightNumber + ' ' + flight.cityFrom + ' -> ' + flight.cityTo}">AR2502 Novosibirsk -> Moscow</h2>
 
                     <div class="payment-form">
-                      <form action="#" th:each="i: ${#numbers.sequence(1, count)}" method="post">
-                        <h4 class="section-heading" th:text="'Information about passenger ' + ${i} + '.'">Information about passenger</h4>
+                      <form action="#" th:each="passenger, stat: ${passengers}" method="post">
+                        <h4 class="section-heading" th:text="'Information about passenger ' + ${stat.index + 1} + '.'">Information about passenger</h4>
 
                         <div class="cardholder-name">
                           <label for="cardholder-name" class="label-default">Surname</label>
-                          <input type="text"
-                                 th:attr="name = 'lastName-' + ${i}" id="cardholder-name_1" class="input-default"
-                                 placeholder="Ivanov"/>
+                          <h6 th:text="${passenger.lastName}" id="cardholder-name_1" class="input-default">Ivanov</h6>
                         </div>
+
                         <div class="cardholder-name">
                           <label for="cardholder-name" class="label-default">Name</label>
-                          <input type="text"
-                                 th:attr="name = 'firstName-' + ${i}" id="cardholder-name" class="input-default"
-                                 placeholder="Ivan"/>
+                          <h6 th:text="${passenger.firstName}" id="cardholder-name_2" class="input-default">Ivan</h6>
                         </div>
 
                         <div class="card-number">
                           <label for="card-number" class="label-default">Passport number</label>
-                          <input type="number"
-                                 th:attr="name = 'passport-' + ${i}" id="card-number" class="input-default"
-                                 placeholder="0000000000"/>
+                          <h6 th:text="${passenger.passport}" id="cardholder-number" class="input-default">0000000000</h6>
                         </div>
 
                         <div class="card-number">
-                          <label for="card-number" class="label-default">Birthday Date</label>
-                          <input type="date" min="1921-12-15" th:max="${#calendars.format(#calendars.createNow(), 'yyyy-MM-dd')}"
-                                 th:attr="name = 'birthdayDate-' + ${i}" id="birth" class="input-default"/>
+                          <label for="card-date" class="label-default">Birthday Date</label>
+                          <h6 th:text="${passenger.birthdayDate}" id="birth" class="input-default">1950-01-01</h6>
                         </div>
+
+                        <p th:if="${passenger.luggage == 1}">
+                          <label>
+                            <input type="checkbox" checked="checked" disabled="disabled"/>
+                            <span>Luggage</span>
+                          </label>
+                        </p>
+
+                        <p th:if="${passenger.insurance == 1}">
+                          <label>
+                            <input type="checkbox" checked="checked" disabled="disabled"/>
+                            <span>Insurance</span>
+                          </label>
+                        </p>
+
+                        <p th:if="${passenger.autoregistration == 1}">
+                          <label>
+                            <input type="checkbox" checked="checked" disabled="disabled"/>
+                            <span>Autoregistration</span>
+                          </label>
+                        </p>
                       </form>
                     </div>
-
-                    <p>
-                      <label>
-                        <input type="checkbox" name="luggage" id="luggage"
-                               th:checked="${luggage}" th:onclick="|show(this,'luggage-price','${flight.price}','${count}');|"/>
-                        <span>Add luggage + 2500 RUB/Per</span>
-                      </label>
-                    </p>
-                    <p>
-                      <label>
-                        <input type="checkbox" name="insurance" id="insurance"
-                               th:checked="${insurance}" th:onclick="|show(this,'insurance-price','${flight.price}','${count}');|"/>
-                        <span>Add insurance for passengers + 600 RUB/Per</span>
-                      </label>
-                    </p>
-
-                    <p>
-                      <label>
-                        <input type="checkbox" name="autoregistration" id="autoregistration"
-                               th:checked="${autoregistration}"  th:onclick="|show(this,'autoregistration-price','${flight.price}','${count}');|"/>
-                        <span>Add autoregistration for all passengers + 50 RUB/per</span>
-                      </label>
-                    </p>
                   </section>
 
                   <section class="cart">
@@ -123,83 +115,79 @@
                             <h4 class="product-name">Air ticket</h4>
                             <div class="wrapper">
                               <div class="price">
-                                <span id="price" th:text="${flight.price}">0</span> RUB
+                                <span id="price" th:text="${price.ticketPrice} + ' RUB'">0</span>
                               </div>
                               <div class="product-qty">
-                                <span id="quantity" th:text="${'x   ' + count}">1</span>
+                                <span id="quantity" th:text="${'x   ' + price.ticketCount}">1</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="product-card" id="luggage-price" style="display:block; display:none;">
-                        <div class="card">
+                      <div class="product-card">
+                        <div class="card" th:if="${price.luggageCount != 0}">
                           <div class="detail">
                             <h4 class="product-name">Luggage</h4>
                             <div class="wrapper">
                               <div class="price">
-                                <span id="price-lug">2500.0 RUB</span>
+                                <span id="price" th:text="${price.luggagePrice} + ' RUB'"></span>
                               </div>
                               <div class="product-qty">
-                                <span id="quantity" th:text="${'x   ' + count}">1</span>
+                                <span id="quantity" th:text="${'x   ' + price.luggageCount}">1</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="product-card" id="insurance-price" style="display:block; display:none;">
-                        <div class="card">
+                      <div class="product-card">
+                        <div class="card" th:if="${price.insuranceCount != 0}">
                           <div class="detail">
                             <h4 class="product-name">Insurance</h4>
                             <div class="wrapper">
                               <div class="price">
-                                <span id="price-ins">600.0 RUB</span>
+                                <span id="price" th:text="${price.insurancePrice} + ' RUB'"></span>
                               </div>
                               <div class="product-qty">
-                                <span id="quantity-ins" th:text="${' x ' + count}">1</span>
+                                <span id="quantity" th:text="${'x   ' + price.insuranceCount}">1</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
 
-                      <div class="product-card" id="autoregistration-price" style="display:block; display:none;">
-                        <div class="card">
+                      <div class="product-card">
+                        <div class="card" th:if="${price.autoregistrationCount != 0}">
                           <div class="detail">
                             <h4 class="product-name">Autoregistration</h4>
                             <div class="wrapper">
                               <div class="price">
-                                <span id="price-ar">50.0 RUB</span>
+                                <span id="price" th:text="${price.autoregistrationPrice} + ' RUB'"></span>
                               </div>
                               <div class="product-qty">
-                                <span id="quantity-ar" th:text="${' x ' + count}">1</span>
+                                <span id="quantity" th:text="${'x   ' + price.autoregistrationCount}">1</span>
                               </div>
                             </div>
                           </div>
                         </div>
                       </div>
-                    </div>
 
-                    <div class="wrapper">
-                      <div class="amount">
-                        <div class="total">
-                          <span>Total</span>
-                          <span>
-                              <span id="total" th:text="${flight.price * count}"></span> RUB
-                            </span>
+                      <div class="wrapper">
+                        <div class="amount">
+                          <div class="total">
+                            <span>Total</span>
+                            <span>
+                                <span id="total" th:text="${price.total}"></span> RUB
+                              </span>
+                          </div>
+
+                          <button class="btnn btnn-primary">
+                            <span id="cancel">CLOSE</span>
+                          </button>
                         </div>
-
-                        <button class="btn btn-primary" href="example">
-                          <span id="payAmount">BUY</span>
-                        </button>
-
-                        <button class="btnn btnn-primary">
-                          <span id="cancel">CANCEL</span>
-                        </button>
-                      </div>
-                    </div>
+                      </div>`
+                    </div>`
                   </section>
                 </div>
               </main>
@@ -214,24 +202,6 @@
 <script src="../../js/scriptt.js"></script>
 <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
 <script type="nomodule" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
-<script>
-  function show(box, name, price, count) {
-    var vis = (box.checked) ? "block" : "none";
-    document.getElementById(name).style.display = vis;
-
-    var totalPrice = price * count;
-    if (document.getElementById('luggage').checked) {
-      totalPrice += 2500 * count;
-    }
-    if (document.getElementById('insurance').checked) {
-      totalPrice += 600 * count;
-    }
-    if (document.getElementById('autoregistration').checked) {
-      totalPrice += 50 * count;
-    }
-    document.getElementById("total").textContent = totalPrice;
-  }
-</script>
 <script>
   let sidebar = document.querySelector(".sidebar");
   let sidebarBtn = document.querySelector(".sidebarBtn");

@@ -20,7 +20,7 @@ public class Flight {
 
     private int passengersCount;
 
-    private ArrayList<String> days = new ArrayList<String>();
+    private ArrayList<String> days = new ArrayList<>();
 
     public Flight(String flightNumber, String cityFrom, String cityTo, String timeFrom, String timeTo, double price, int passengersCount) {
         this.flightNumber = flightNumber;
@@ -31,6 +31,8 @@ public class Flight {
         this.passengersCount = passengersCount;
         this.price = price;
     }
+
+    public Flight() {}
 
     public String getDays() {
         StringBuilder s = new StringBuilder();
