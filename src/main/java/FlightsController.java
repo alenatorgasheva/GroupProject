@@ -1,3 +1,4 @@
+import model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -9,8 +10,14 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Map;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+
+import static model.User.ROLE.USER;
 
 
 @Controller
@@ -38,7 +45,7 @@ public class FlightsController {
 	}
 
 	@RequestMapping(value = "sign-in", method = RequestMethod.GET)
-	public ModelAndView singIn(@RequestParam Map allParams, @ModelAttribute Search search) {
+	public ModelAndView singIn(@RequestParam Map allParams, @ModelAttribute Search search) throws SQLException {
 		ModelAndView modelAndView = new ModelAndView();
 
 		User user = new User(String.valueOf(allParams.get("email")), String.valueOf(allParams.get("password")));
@@ -58,6 +65,7 @@ public class FlightsController {
 				modelAndView.addObject("email", user.getLogin());
 			}
 		} else {
+			user.get().add(new User(3,user.getLogin(), user.getPassword(), USER));
 			modelAndView.setViewName("login");
 		}
 		return modelAndView;
