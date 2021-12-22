@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+
+    <link rel="stylesheet" href="style_2.css">
+      <link rel="stylesheet" href="stylee.css">
+
+    <link href='https://unpkg.com/boxicons@2.0.7/css/boxicons.min.css' rel='stylesheet'>
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   </head>
+<body>
+  <div class="sidebar">
+    <div class="logo-details">
+
+      <span class="logo_name"></span>
+    </div>
+      <ul class="nav-links">
+
+          <li>
+          <a href="cabinet.html" class="">
+            <i class='bx bx-grid-alt' ></i>
+            <span class="links_name">Personal account</span>
+          </a>
+        </li>
+          <li>
+          <a href="cabinet.html" class="active">
+            <i class='bx bx-grid-alt' ></i>
+            <span class="links_name">Details</span>
+          </a>
+        </li>
+
+        <li class="log_out">
+          <a href="login_1.html">
+            <i class='bx bx-log-out'></i>
+            <span class="links_name">Log out</span>
+          </a>
+        </li>
+      </ul>
+  </div>
+  <section class="home-section">
+    <nav>
+      <div class="sidebar-button">
+        <i class='bx bx-menu sidebarBtn'></i>
+        <span class="dashboard">Airline reservation system</span>
+      </div>
+        <div>
+            <a href="#">example@mail.ru</a>
+        </div>
+    </nav>
+
+
+
+    <script src="TableFilter.min.js" defer></script>
+    <div class="home-content">
+
+      <div class="sales-boxes">
+
+        <div class="recent-sales box">
+
+          <div class="table-responsive">
+
+            <main class="py-4">
+                <main class="container">
+
+    <h1 class="heading">
+      <ion-icon name="cart-outline"></ion-icon> Order Information </h1>
+
+    <div class="item-flex">
+
+      <!--
+       - checkout section
+      -->
+      <section class="checkout">
+
+        <h1 class="section-heading">AR2502 Novosibirsk - Moscow</h1>
+
+          <div class="payment-form">
+
+          <form action="#"><h4 class="section-heading">Passenger data</h4>
+
+            <table id="filter" class="table">
+
+                            <tbody>
+                                <tr>
+
+                                    <td> Surname </td>
+                                    <td> Ivanov </td>
+                                </tr>
+
+                                 <tr>
+
+                                    <td> Name </td>
+                                    <td> Ivan </td>
+                                </tr>
+                                 <tr>
+
+                                    <td> Passport number </td>
+                                    <td> 0000 0000 000 </td>
+                                </tr>
+                                <tr>
+
+                                    <td> Date of birth </td>
+                                    <td> 0000 0000 000 </td>
+                                </tr>
+                                <tr>
+                                    <td> Luggage </td>
+                                    <td><input type="checkbox"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+          </form>
+
+        </div>
+
+
+
+      </section>
+
+
+
+      <!--
+        - cart section
+      -->
+      <section class="cart">
+
+        <div class="cart-item-box">
+
+          <h2 class="section-heading">Total amount</h2>
+
+          <div class="product-card">
+
+            <div class="card">
+
+              <div class="detail">
+                  
+
+                <div class="wrapper">
+                    <table class="table">
+                            <tbody>
+                                <tr>
+
+                                    <td> Airticket </td>
+                                    <td> 1 </td>
+                                    <td> 6652  RUB</td>
+                                </tr>
+
+                                 <tr>
+
+                                    <td> Luggage </td>
+                                    <td> 1 </td>
+                                    <td> 000  RUB</td>
+                                </tr>
+                                 <tr>
+
+                                    <td> Insurance </td>
+                                    <td> 1 </td>
+                                    <td> 000  RUB</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+
+
+
+                </div>
+
+              </div>
+
+
+            </div>
+
+          </div>
+
+        <div class="wrapper">
+
+
+          <div class="amount">
+
+
+            <div class="total">
+              <span>Total</span> <span>РУБ <span id="total"></span></span>
+            </div>
+              <button class="btnn btnn-primary">
+           <span id="cancel">Cancel</span>
+              </button>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+  </main>
+
+
+            </main>
+        </div>
+      </div>
+  </section>
+
+   <script src="./scriptt.js"></script>
+
+  <!--
+    - ionicon link
+  -->
+  <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+
+
+  <script>
+
+   let sidebar = document.querySelector(".sidebar");
+let sidebarBtn = document.querySelector(".sidebarBtn");
+sidebarBtn.onclick = function() {
+  sidebar.classList.toggle("active");
+  if(sidebar.classList.contains("active")){
+  sidebarBtn.classList.replace("bx-menu" ,"bx-menu-alt-right");
+}else
+  sidebarBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+}
+ </script>
+
+</body>
+</html>
+
